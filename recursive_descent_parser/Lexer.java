@@ -4,12 +4,6 @@ import java.util.ArrayList;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-class LexicalException extends Exception {
-    public LexicalException(String message) {
-        super("Token: " + message + " is invalid");
-    }
-}
-
 public class Lexer {
     private ArrayList<TokenType> types = new ArrayList<>();
     private ArrayList<Token> tokens = new ArrayList<>();
@@ -32,16 +26,24 @@ public class Lexer {
         types.add(new TokenType("FINSI", "fin-si"));
         types.add(new TokenType("MIENTRAS", "mientras"));
         types.add(new TokenType("FINMIENTRAS", "fin-mientras"));
-        types.add(new TokenType("VARIABLE", "[a-zA-Z_] [a-zA-Z0-9_]*"));
+        types.add(new TokenType("REPITE", "repite"));
+        types.add(new TokenType("HASTA", "hasta"));
+        types.add(new TokenType("VAR", "var"));
+        types.add(new TokenType("ENTERO", "entero"));
+        types.add(new TokenType("REAL", "real"));
+        types.add(new TokenType("TIPOSTRING", "cadena"));
+        types.add(new TokenType("VARIABLE", "[a-zA-Z_][a-zA-Z0-9_]*"));
         types.add(new TokenType("ESPACIO", "[ \t\f\r\n]+"));
         types.add(new TokenType("ERROR", "[^\t\f\n]+"));
     }
 
     public void analyze(String input) throws LexicalException {
         StringBuffer er = new StringBuffer();
-        for (TokenType tt : types)
+        for (TokenType tt : types) {
+            if (er.length() > 0) er.append("|");
             er.append(String.format("(?<%s>%s)", tt.getName(), tt.getPattern()));
-        Pattern p = Pattern.compile(new String(er.substring(1)));
+        }
+        Pattern p = Pattern.compile(er.toString());
         Matcher m = p.matcher(input);
         while (m.find()) {
             for (TokenType tt : types) {
